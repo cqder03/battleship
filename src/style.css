@@ -115,6 +115,23 @@ main {
   background-color: skyblue;
 }
 
+#board-holder {
+  display: flex;
+  gap: 5vw;
+}
+
 .black {
   background-color: black ;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.red {
+  background-color: red;
+}
+
+.aqua {
+  background-color: lightskyblue;
 }
