@@ -76,6 +76,7 @@ function placeShips() {
   const placementHeading = document.createElement("div");
   const placementPara1 = document.createElement("p");
   const placementPara2 = document.createElement("p");
+  const placementDirection = document.createElement("p");
   const startGame = document.createElement("button");
   const boardOne = createBoard(1);
   const gameboard = new Gameboard();
@@ -83,29 +84,27 @@ function placeShips() {
   placementHeading.setAttribute("id", "placement-heading");
   placementPara1.setAttribute("id", "placemenet-para-1");
   placementPara2.setAttribute("id", "placemenet-para-2");
+  placementDirection.setAttribute("id", "placement-direction");
   startGame.setAttribute("id", "start-game");
 
   placementPara1.textContent = "PLACE YOUR SHIPS";
   placementPara2.textContent = "PLACE SHIP (LENGTH: 5)";
+  placementDirection.textContent = "HORIZONTAL";
   startGame.textContent = "START GAME";
 
   main.appendChild(placementHeading);
   placementHeading.appendChild(placementPara1);
   placementHeading.appendChild(placementPara2);
+  placementHeading.appendChild(placementDirection);
   main.appendChild(boardOne);
 
-  for (let j = 0; j < 10; j++) {
-    const boardRow = document.createElement("div");
-    boardRow.classList.add("board-row");
-    boardRow.setAttribute("id", `b1row-${j}`);
-    boardOne.appendChild(boardRow);
-    for (let k = 0; k < 10; k++) {
-      const boardField = document.createElement("div");
-      boardField.classList.add("board-field");
-      boardField.setAttribute("id", `r${j}f-${k}`);
-      boardRow.appendChild(boardField);
+  placementDirection.addEventListener("click", () => {
+    if (placementDirection.textContent === "HORIZONTAL") {
+      placementDirection.textContent = "VERTICAL";
+    } else {
+      placementDirection.textContent = "HORIZONTAL";
     }
-  }
+  });
 
   let shipCount = 0;
 
@@ -115,22 +114,32 @@ function placeShips() {
     if (eventId[0] === "r" || event[2] === "f") {
       let rowNumber = Number(eventId[1]);
       let fieldNumber = Number(eventId.slice(4));
+      let direction = placementDirection.textContent.toLowerCase();
 
       if (shipCount < 5) {
         let ship = new Ship(ships[shipCount].length, ships[shipCount].name);
         if (
-          gameboard.placeShip([rowNumber, fieldNumber], ship, 1) ===
+          gameboard.placeShip([rowNumber, fieldNumber], ship, 1, direction) ===
           "Field occupied"
         ) {
           return alert("Incorrect field");
         }
         for (let i = 0; i < ships[shipCount].length; i++) {
-          document
-            .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
-            .classList.add("black");
-          document
-            .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
-            .classList.remove("aqua");
+          if (direction === "horizontal") {
+            document
+              .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
+              .classList.add("black");
+            document
+              .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
+              .classList.remove("aqua");
+          } else if (direction === "vertical") {
+            document
+              .querySelector(`#r${rowNumber + i}f-${fieldNumber}`)
+              .classList.add("black");
+            document
+              .querySelector(`#r${rowNumber + i}f-${fieldNumber}`)
+              .classList.remove("aqua");
+          }
         }
 
         shipCount++;
@@ -146,14 +155,26 @@ function placeShips() {
         while (secondCount < 5) {
           let randomNumber = Math.floor(Math.random() * (9 - 0) + 0);
           let randomNumber2 = Math.floor(Math.random() * (9 - 0) + 0);
+          let randomNumber3 = Math.round(Math.random() * (2 - 1) + 1); // Math.round used for higher chance of getting 2 for 'vertical' direction
+          let direction;
+
+          if (randomNumber3 === 1) {
+            direction = "horizontal";
+          } else if (randomNumber3 === 2) {
+            direction = "vertical";
+          }
           let ship = new Ship(
             ships[secondCount].length,
             ships[secondCount].name
           );
 
           if (
-            gameboard.placeShip([randomNumber, randomNumber2], ship, 2) !==
-            "Field occupied"
+            gameboard.placeShip(
+              [randomNumber, randomNumber2],
+              ship,
+              2,
+              direction
+            ) !== "Field occupied"
           ) {
             secondCount++;
           }
@@ -170,6 +191,7 @@ function placeShips() {
 
   boardOne.addEventListener("mouseover", (event) => {
     const eventId = event.target.id;
+    const direction = placementDirection.textContent.toLowerCase();
     if (eventId[0] === "r" || event[2] === "f") {
       let rowNumber = Number(eventId[1]);
       let fieldNumber = Number(eventId.slice(4));
@@ -181,10 +203,17 @@ function placeShips() {
           return;
         }
         for (let i = 0; i < ships[shipCount].length; i++) {
-          if (fieldNumber + i > 9) return;
-          boardOne
-            .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
-            .classList.toggle("aqua");
+          if (direction === "horizontal") {
+            if (fieldNumber + i > 9) return;
+            document
+              .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
+              .classList.toggle("aqua");
+          } else if (direction === "vertical") {
+            if (rowNumber + i > 9) return;
+            document
+              .querySelector(`#r${rowNumber + i}f-${fieldNumber}`)
+              .classList.toggle("aqua");
+          }
         }
       }
     }
@@ -192,6 +221,7 @@ function placeShips() {
 
   boardOne.addEventListener("mouseout", (event) => {
     const eventId = event.target.id;
+    const direction = placementDirection.textContent.toLowerCase();
     if (eventId[0] === "r" || event[2] === "f") {
       let rowNumber = Number(eventId[1]);
       let fieldNumber = Number(eventId.slice(4));
@@ -203,10 +233,17 @@ function placeShips() {
           return;
         }
         for (let i = 0; i < ships[shipCount].length; i++) {
-          if (fieldNumber + i > 9) return;
-          boardOne
-            .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
-            .classList.toggle("aqua");
+          if (direction === "horizontal") {
+            if (fieldNumber + i > 9) return;
+            document
+              .querySelector(`#r${rowNumber}f-${fieldNumber + i}`)
+              .classList.toggle("aqua");
+          } else if (direction === "vertical") {
+            if (rowNumber + i > 9) return;
+            document
+              .querySelector(`#r${rowNumber + i}f-${fieldNumber}`)
+              .classList.toggle("aqua");
+          }
         }
       }
     }
@@ -218,15 +255,15 @@ function playGame(gameboard, boardOne) {
   const boardHolder = document.createElement("div");
   const boardTwo = createBoard(2);
   const computerAI = new aiPlayer("Computer");
-  const gameVerdict = document.createElement("div");
-  const gameVerdictPara = document.createElement("p");
+  const gameVerdict = document.createElement('div');
+  const gameVerdictPara = document.createElement('p');
   const playAgain = document.createElement("button");
 
   boardHolder.setAttribute("id", "board-holder");
-  gameVerdict.setAttribute("id", "game-verdict");
-  gameVerdictPara.setAttribute("id", "game-verdict-text");
+  gameVerdict.setAttribute('id', 'game-verdict');
+  gameVerdictPara.setAttribute('id', 'game-verdict-text');
   playAgain.setAttribute("id", "play-again");
-
+  
   playAgain.textContent = "PLAY AGAIN";
 
   main.appendChild(boardHolder);
@@ -280,7 +317,7 @@ function playGame(gameboard, boardOne) {
 
       if (gameboard.areAllShipsSunk(1) || gameboard.areAllShipsSunk(2)) {
         if (gameboard.areAllShipsSunk(1)) {
-          gameVerdictPara.textContent = "Computer wins";
+          gameVerdictPara.textContent = 'Computer wins';
         } else if (gameboard.areAllShipsSunk(2)) {
           gameVerdictPara.textContent = "You won";
         }

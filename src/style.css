@@ -69,6 +69,18 @@ main,
   border-radius: 8px;
 }
 
+#placement-direction {
+  position: absolute;
+  right: 5px;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+#placement-direction:hover {
+  background-color: gray;
+}
+
 #start-game,
 #play-again {
   margin-top: 2vh;
@@ -135,4 +147,18 @@ main,
 
 .aqua {
   background-color: lightskyblue;
+}
+
+#game-verdict {
+  margin-top: 5vh;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: white;
+}
+
+#game-verdict-text {
+  font-size: 48px;
 }
